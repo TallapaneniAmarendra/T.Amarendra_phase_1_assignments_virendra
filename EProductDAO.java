@@ -1,20 +1,31 @@
-import java.util.List;
+package com.ecommerce.dao;
 
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.ecommerce.entity.EProductEntity;
+import java.sql.ResultSet;    
+import java.sql.SQLException;    
+import java.util.List;    
+import org.springframework.jdbc.core.BeanPropertyRowMapper;    
+import org.springframework.jdbc.core.JdbcTemplate;    
+import org.springframework.jdbc.core.RowMapper;    
+import com.ecommerce.entity.EProduct;   
 
-@Repository
 public class EProductDAO {
 
-        @Autowired
-    private SessionFactory sessionFactory;
-
-        @SuppressWarnings("unchecked")
-        public List<EProductEntity> getAllProducts() {
-                return this.sessionFactory.getCurrentSession().createQuery("from EProducts").list();
-        }
+        JdbcTemplate template;    
+            
+        public void setTemplate(JdbcTemplate template) {    
+            this.template = template;    
+        }    
+        
+        public List<EProduct> getProducts(){    
+            return template.query("select * from eproduct",new RowMapper<EProduct>(){    
+                public EProduct mapRow(ResultSet rs, int row) throws SQLException {    
+                        EProduct e=new EProduct();    
+                    e.setID(rs.getInt(1));    
+                    e.setName(rs.getString(2));    
+                    e.setPrice(rs.getBigDecimal(3));    
+                    e.setDateAdded(rs.getDate(4));    
+                    return e;    
+                }    
+            });    
+        }    
 }
